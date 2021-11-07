@@ -33,7 +33,7 @@ class clutch
       delay(200); //Change the delay values based on the PWM set
       digitalWrite(motor1pin1, LOW);
       digitalWrite(motor1pin2, LOW);
-      delay(20)
+      delay(20);
     }
   };
 class MotorTest
