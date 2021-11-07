@@ -1,11 +1,100 @@
-// Set motor pins
-int motor1pin1 = 6;
-int motor1pin2 = 7;
+// Set motor1 pins
+int motor1pin1 = 5;
+int motor1pin2 = 6;
 
-int motor2pin1 = 4;
-int motor2pin2 = 5;
+// Set motor1 pins
+int motor2pin1 = 9;
+int motor2pin2 = 10;
 
-volatile int count = 0;//if the interrupt will change this value, it must be volatile
+// Set enable pins
+int ena = 3;
+int enb = 11;
+
+//Set interrupt pins for encoder
+volatile int count1 = 0;//if the interrupt will change this value, it must be volatile0
+volatile int count2 = 0;
+
+class clutch
+{
+  void engage()
+  {
+      digitalWrite(motor1pin1, HIGH);
+      digitalWrite(motor1pin2, LOW); 
+      delay(200); //Change the delay values based on the PWM set
+      digitalWrite(motor1pin1, LOW);
+      digitalWrite(motor1pin2, LOW);
+      delay(20);
+    }
+
+  void disengage()
+  {
+      digitalWrite(motor1pin1, LOW);
+      digitalWrite(motor1pin2, HIGH); 
+      delay(200); //Change the delay values based on the PWM set
+      digitalWrite(motor1pin1, LOW);
+      digitalWrite(motor1pin2, LOW);
+      delay(20)
+    }
+  };
+class MotorTest
+/*
+ * This class is to test the motors and the directions in which they rotate
+ * Use this before enganging the clutch
+ */
+
+{
+  void stopMotor(int a)
+  {
+      //If a = 1, we stop motor 1, if a = 2, we stop motor 2
+      if (a == 1)
+      {
+      digitalWrite(motor1pin1, LOW);
+      digitalWrite(motor1pin2, LOW);
+      delay(100);
+ 
+      }
+      else if (a == 2)
+      {
+      digitalWrite(motor2pin1, LOW);
+      digitalWrite(motor2pin2, LOW);
+      delay(100);
+        }
+    }
+
+  void startMotor(char c, int a)
+  {
+      //If a = 1, we start motor 1, if a = 2, we start motor 2
+      // char c decides the rotation direction, A is anticlockwise and C is clockwise
+      if (c == 'C')
+      {
+      if (a == 1)
+      {
+      digitalWrite(motor1pin1, HIGH);
+      digitalWrite(motor1pin2, LOW); 
+      }
+      else if (a == 2)
+      {
+      digitalWrite(motor2pin1, HIGH);
+      digitalWrite(motor2pin2, LOW);
+        }
+      }
+      if (c == 'A')
+      {
+        if (a == 1)
+      {
+      digitalWrite(motor1pin1, LOW);
+      digitalWrite(motor1pin2, HIGH); 
+      }
+      else if (a == 2)
+      {
+      digitalWrite(motor2pin1, LOW);
+      digitalWrite(motor2pin2, HIGH);
+        }
+        }
+    }
+  
+  };
+
 
 void setup() {
 // Initialize motor pins as output pins
@@ -13,11 +102,17 @@ void setup() {
   pinMode(motor1pin2, OUTPUT);
   pinMode(motor2pin1, OUTPUT);
   pinMode(motor2pin2, OUTPUT);
+  pinMode(ena, OUTPUT);
+  pinMode(enb, OUTPUT);
 
 // Setup for Interrupt
   pinMode(2, INPUT); //set as input
   digitalWrite(2, HIGH);//enable internal pullup resistor
-  attachInterrupt(digitalPinToInterrupt(2), interruptName, RISING);//Interrupt initialization
+  attachInterrupt(digitalPinToInterrupt(2), interruptName1, RISING);//Interrupt initialization
+
+  pinMode(3, INPUT); //set as input
+  digitalWrite(3, HIGH);//enable internal pullup resistor
+  attachInterrupt(digitalPinToInterrupt(3), interruptName2, RISING);//Interrupt initialization
 
   Serial.begin(9600);
   
@@ -25,18 +120,38 @@ void setup() {
 
 void loop() {
 
-// Turn on the Motors
+  /*
+   * Before turning on the motors, please check the pin connections
+   * Check motor connections to confirm clockwise amd anticlockwose direction
+   * 
+   */
+
+  //Set PWM speed
+  analogWrite(ena, 70);
+  analogWrite(enb, 73);
+  delay(20);
+
+  digitalWrite(motor1pin1, HIGH);
+  digitalWrite(motor1pin2, LOW);
+
+  delay(500);
   digitalWrite(motor1pin1, LOW);
-  digitalWrite(motor1pin2, HIGH);
+  digitalWrite(motor1pin2, LOW);
+  delay(20);
 
-  digitalWrite(motor2pin1, LOW);
-  digitalWrite(motor2pin2, HIGH);
+  digitalWrite(motor1pin1, HIGH);
+  digitalWrite(motor1pin2, LOW);
 
-  Serial.println(count);//see the counts advance
+  digitalWrite(motor2pin1, HIGH);
+  digitalWrite(motor2pin2, LOW);
+
+  Serial.println(count1);//see the counts advance
+  Serial.print(" ");
+  Serial.print(count2);
   delay(100);//Delays usually can't be interfered with, here we will see the interrupt work
 
 
-  if (count > 20) //Set the number for a  particular position. We have very fine control upto 5 degrees
+  if (count1 > 1000) //Set the number for a  particular position
   {
   // Stops the motor as the desired position  
   digitalWrite(motor1pin1, LOW);
@@ -44,11 +159,16 @@ void loop() {
 
   digitalWrite(motor2pin1, LOW);
   digitalWrite(motor2pin2, LOW);
-  delay(5000);
+  delay(20);
     }
+ 
 }
-
-void interruptName()
+void interruptName1()
 {
-  count = count+1;
+  count1 = count1+1;
 }//end Interrupt Service Routine (ISR)
+
+void interruptName2()
+{
+  count2 = count2+1;
+}
