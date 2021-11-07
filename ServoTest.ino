@@ -131,20 +131,6 @@ void loop() {
   analogWrite(enb, 73);
   delay(20);
 
-  digitalWrite(motor1pin1, HIGH);
-  digitalWrite(motor1pin2, LOW);
-
-  delay(500);
-  digitalWrite(motor1pin1, LOW);
-  digitalWrite(motor1pin2, LOW);
-  delay(20);
-
-  digitalWrite(motor1pin1, HIGH);
-  digitalWrite(motor1pin2, LOW);
-
-  digitalWrite(motor2pin1, HIGH);
-  digitalWrite(motor2pin2, LOW);
-
   Serial.println(count1);//see the counts advance
   Serial.print(" ");
   Serial.print(count2);
