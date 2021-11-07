@@ -16,6 +16,7 @@ volatile int count2 = 0;
 
 class clutch
 {
+  public:
   void engage()
   {
       digitalWrite(motor1pin1, HIGH);
@@ -42,7 +43,10 @@ class MotorTest
  * Use this before enganging the clutch
  */
 
+  
 {
+  public:
+  
   void stopMotor(int a)
   {
       //If a = 1, we stop motor 1, if a = 2, we stop motor 2
@@ -67,30 +71,30 @@ class MotorTest
       // char c decides the rotation direction, A is anticlockwise and C is clockwise
       if (c == 'C')
       {
-      if (a == 1)
-      {
-      digitalWrite(motor1pin1, HIGH);
-      digitalWrite(motor1pin2, LOW); 
-      }
-      else if (a == 2)
-      {
-      digitalWrite(motor2pin1, HIGH);
-      digitalWrite(motor2pin2, LOW);
+        if (a == 1)
+        {
+        digitalWrite(motor1pin1, HIGH);
+        digitalWrite(motor1pin2, LOW); 
         }
+        else if (a == 2)
+        {
+        digitalWrite(motor2pin1, HIGH);
+        digitalWrite(motor2pin2, LOW);
+          }
       }
       if (c == 'A')
       {
         if (a == 1)
-      {
-      digitalWrite(motor1pin1, LOW);
-      digitalWrite(motor1pin2, HIGH); 
-      }
+          {
+          digitalWrite(motor1pin1, LOW);
+          digitalWrite(motor1pin2, HIGH); 
+          }
       else if (a == 2)
-      {
-      digitalWrite(motor2pin1, LOW);
-      digitalWrite(motor2pin2, HIGH);
-        }
-        }
+          {
+          digitalWrite(motor2pin1, LOW);
+          digitalWrite(motor2pin2, HIGH);
+            }
+      }
     }
   
   };
@@ -131,15 +135,58 @@ void loop() {
   analogWrite(enb, 73);
   delay(20);
 
+  MotorTest Motor1, Motor2;
+  String command;
+  char C, A;
+  // Giving commands from Serial Monitor
+  if(Serial.available()){
+        command = Serial.readStringUntil('\n');
+         
+        if(command.equals("Stop Motor 1")){
+             Motor1.stopMotor(1);   
+        }
+        else if(command.equals("Stop Motor 2")){
+            Motor2.stopMotor(2);
+        }
+        else if(command.equals("Start Motor 1 Clockwise")){
+            Motor1.startMotor(C,1);
+        }
+        else if(command.equals("Start Motor 2 Clockwise")){
+            Motor1.startMotor(C,2);
+        }
+
+        else if(command.equals("Start Motor 1 Anticlockwise")){
+            Motor1.startMotor(A,1);
+        }
+        else if(command.equals("Start Motor 2 Anticlockwise")){
+            Motor1.startMotor(A,2);
+        }
+
+        else if(command.equals("Engage")){
+            Motor1.startMotor(A,2);
+        }
+
+        else if(command.equals("Disengage")){
+            Motor1.startMotor(A,2);
+        }
+        
+        else{
+            Serial.println("Invalid command");
+        }
+    }
+  
+
+  /*
+   * To print counts
   Serial.println(count1);//see the counts advance
   Serial.print(" ");
   Serial.print(count2);
   delay(100);//Delays usually can't be interfered with, here we will see the interrupt work
-
-
+  */
+  
   if (count1 > 1000) //Set the number for a  particular position
   {
-  // Stops the motor as the desired position  
+  // Stops the motor at the desired position  
   digitalWrite(motor1pin1, LOW);
   digitalWrite(motor1pin2, LOW);
 
